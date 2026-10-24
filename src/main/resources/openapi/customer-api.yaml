@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: Customer Service API
+  description: |
+    API para la gestión de clientes del sistema bancario.
+    Un cliente puede ser PERSONAL o BUSINESS y tener un perfil STANDARD, VIP (solo PERSONAL) o PYME (solo BUSINESS).
+  version: 1.0.0
+  contact:
+    name: Bootcamp Microservicios
+servers:
+  - url: http://localhost:8080/api
+    description: A través del API Gateway
+  - url: http://localhost:8081
+    description: Directo al servicio (solo desarrollo)
+tags:
+  - name: Customers
+    description: Operaciones sobre clientes
+
+paths:
+  /customers:
+    get:
+      tags: [Customers]
+      summary: Listar clientes
+      operationId: findAllCustomers
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerResponse'
+    post:
+      tags: [Customers]
+      summary: Registrar un cliente
+      operationId: createCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '201':
+          description: Cliente creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /customers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/CustomerId'
+    get:
+      tags: [Customers]
+      summary: Obtener un cliente por ID
+      operationId: findCustomerById
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Customers]
+      summary: Actualizar un cliente
+      description: No se permite cambiar el tipo ni el documento del cliente.
+      operationId: updateCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdateRequest'
+      responses:
+        '200':
+          description: Cliente actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Customers]
+      summary: Eliminar un cliente
+      description: Eliminación lógica (active = false).
+      operationId: deleteCustomer
+      responses:
+        '204':
+          description: Cliente eliminado
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /customers/document/{documentNumber}:
+    get:
+      tags: [Customers]
+      summary: Obtener un cliente por número de documento
+      operationId: findCustomerByDocumentNumber
+      parameters:
+        - name: documentNumber
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '45678912'
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    CustomerId:
+      name: id
+      in: path
+      required: true
+      description: ID del cliente
+      schema:
+        type: string
+      example: 6710f1c2a3b4c5d6e7f80912
+
+  schemas:
+    CustomerType:
+      type: string
+      enum: [PERSONAL, BUSINESS]
+
+    CustomerProfile:
+      type: string
+      description: VIP solo para PERSONAL; PYME solo para BUSINESS.
+      enum: [STANDARD, VIP, PYME]
+      default: STANDARD
+
+    DocumentType:
+      type: string
+      description: RUC solo para BUSINESS.
+      enum: [DNI, CEX, PASSPORT, RUC]
+
+    CustomerRequest:
+      type: object
+      required: [documentType, documentNumber, customerType, email, phone]
+      properties:
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        documentNumber:
+          type: string
+          minLength: 8
+          maxLength: 12
+          pattern: '^[A-Za-z0-9]+$'
+          example: '45678912'
+        customerType:
+          $ref: '#/components/schemas/CustomerType'
+        profile:
+          $ref: '#/components/schemas/CustomerProfile'
+        firstName:
+          type: string
+          maxLength: 100
+          description: Obligatorio si customerType = PERSONAL.
+          example: Juan
+        lastName:
+          type: string
+          maxLength: 100
+          description: Obligatorio si customerType = PERSONAL.
+          example: Pérez
+        businessName:
+          type: string
+          maxLength: 150
+          description: Obligatorio si customerType = BUSINESS.
+          example: Comercial Lurín SAC
+        email:
+          type: string
+          format: email
+          example: juan.perez@mail.com
+        phone:
+          type: string
+          pattern: '^9[0-9]{8}$'
+          example: '987654321'
+        address:
+          type: string
+          maxLength: 200
+          example: Av. Principal 123, Lima
+
+    CustomerUpdateRequest:
+      type: object
+      required: [email, phone]
+      properties:
+        profile:
+          $ref: '#/components/schemas/CustomerProfile'
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        businessName:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          pattern: '^9[0-9]{8}$'
+        address:
+          type: string
+          maxLength: 200
+
+    CustomerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6710f1c2a3b4c5d6e7f80912
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        documentNumber:
+          type: string
+        customerType:
+          $ref: '#/components/schemas/CustomerType'
+        profile:
+          $ref: '#/components/schemas/CustomerProfile'
+        firstName:
+          type: string
+        lastName:
+          type: string
+        businessName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: Bad Request
+        message:
+          type: string
+          example: El perfil VIP solo aplica a clientes PERSONAL
+        path:
+          type: string
+          example: /customers
+        details:
+          type: array
+          items:
+            type: string
+          example: ['email: debe ser un email válido']
+
+  responses:
+    BadRequest:
+      description: Datos inválidos o regla de negocio incumplida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Cliente no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Ya existe un cliente con ese número de documento
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
