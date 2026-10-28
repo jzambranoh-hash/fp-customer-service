@@ -26,7 +26,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 COPY --from=build /app/target/*.jar app.jar
 USER spring
 
-EXPOSE 8081
+EXPOSE 8091
 
 # MaxRAMPercentage: la JVM usa como máximo el 75 % de la memoria asignada al contenedor
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
