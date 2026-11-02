@@ -7,6 +7,7 @@ import com.nttdata.customer_service.exception.CustomerNotFoundException;
 import com.nttdata.customer_service.exception.DuplicateDocumentException;
 import com.nttdata.customer_service.mapper.CustomerMapper;
 import com.nttdata.customer_service.repository.CustomerRepository;
+import com.nttdata.customer_service.service.validation.CustomerValidator;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -35,11 +36,14 @@ public class CustomerServiceImplTest {
     @Mock
     private CustomerRepository customerRepository;
 
+    @Mock
+    private CustomerValidator customerValidator;
+
     private CustomerServiceImpl customerService;
 
     @BeforeEach
     void setUp() {
-        customerService = new CustomerServiceImpl(customerRepository, new CustomerMapper());
+        customerService = new CustomerServiceImpl(customerRepository, new CustomerMapper(), null);
     }
 
     // ---------------------------------------------------------------- create
