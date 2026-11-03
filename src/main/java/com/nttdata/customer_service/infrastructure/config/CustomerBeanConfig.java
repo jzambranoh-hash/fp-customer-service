@@ -50,8 +50,7 @@ public class CustomerBeanConfig {
      * @return validador de reglas de negocio (contexto del patrón Strategy)
      */
     @Bean
-    public CustomerValidator customerValidator(List<CustomerTypeRules> rules,
-                                               DocumentNumberValidator documentNumberValidator) {
+    public CustomerValidator customerValidator(List<CustomerTypeRules> rules, DocumentNumberValidator documentNumberValidator) {
         return new CustomerValidator(rules, documentNumberValidator);
     }
 

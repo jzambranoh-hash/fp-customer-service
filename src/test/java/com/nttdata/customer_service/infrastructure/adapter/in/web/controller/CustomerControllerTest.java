@@ -1,4 +1,4 @@
-package com.nttdata.customer_service.infrastructure.adapter.in.web;
+package com.nttdata.customer_service.infrastructure.adapter.in.web.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -19,7 +19,6 @@ import com.nttdata.customer_service.domain.port.in.DeleteCustomerUseCase;
 import com.nttdata.customer_service.domain.port.in.FindCustomerUseCase;
 import com.nttdata.customer_service.domain.port.in.UpdateCustomerCommand;
 import com.nttdata.customer_service.domain.port.in.UpdateCustomerUseCase;
-import com.nttdata.customer_service.infrastructure.adapter.in.web.controller.CustomerController;
 import com.nttdata.customer_service.infrastructure.adapter.in.web.handler.GlobalExceptionHandler;
 import com.nttdata.customer_service.infrastructure.adapter.in.web.mapper.CustomerWebMapper;
 import io.reactivex.rxjava3.core.Completable;
