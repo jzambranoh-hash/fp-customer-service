@@ -128,7 +128,7 @@ class CustomerControllerTest {
                 .expectBody().jsonPath("$.id").isEqualTo(ID);
 
         verify(createUseCase).create(eq(new CreateCustomerCommand(DocumentType.DNI, DNI, CustomerType.PERSONAL,
-                null, "Juan", "Pérez", null, "juan.perez@mail.com", "987654321", null)));
+                CustomerProfile.STANDARD, "Juan", "Pérez", null, "juan.perez@mail.com", "987654321", null)));
     }
 
     @Test
@@ -222,6 +222,32 @@ class CustomerControllerTest {
         client.get().uri("/customers/{id}", ID).exchange()
                 .expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.message").isEqualTo("Ocurrió un error interno");
+    }
+
+    @Test
+    void responseStatusWithoutReasonUsesStandardPhrase() {
+        when(findUseCase.findById(ID))
+                .thenReturn(Single.error(new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED)));
+
+        client.get().uri("/customers/{id}", ID)
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.METHOD_NOT_ALLOWED)
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(405)
+                .jsonPath("$.message").isEqualTo("Method Not Allowed");
+    }
+
+    @Test
+    void responseStatusWithReasonUsesReason() {
+        when(findUseCase.findById(ID))
+                .thenReturn(Single.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Recurso no disponible")));
+
+        client.get().uri("/customers/{id}", ID)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(404)
+                .jsonPath("$.message").isEqualTo("Recurso no disponible");
     }
 
     private static Customer customer() {

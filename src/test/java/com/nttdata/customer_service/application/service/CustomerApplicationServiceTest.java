@@ -63,7 +63,6 @@ class CustomerApplicationServiceTest {
     @Nested
     @DisplayName("create")
     class Create {
-
         @Test
         @DisplayName("registra un cliente PERSONAL válido con perfil STANDARD por defecto")
         void createsPersonalCustomer() {
@@ -208,6 +207,20 @@ class CustomerApplicationServiceTest {
             service.findByDocumentNumber(DNI).test()
                     .assertError(error -> error instanceof CustomerNotFoundException
                             && !error.getMessage().contains(DNI));
+        }
+
+        @Test
+        @DisplayName("actualiza el nombre de una persona")
+        void updatesFirstName() {
+            when(customerRepository.findActiveById(ID)).thenReturn(Maybe.just(personal()));
+            when(customerRepository.save(any(Customer.class)))
+                    .thenAnswer(invocation -> Single.just(invocation.getArgument(0)));
+            UpdateCustomerCommand command = new UpdateCustomerCommand(null, "Ana", null, null,
+                    "nuevo@mail.com", "912345678", null);
+
+            service.update(ID, command).test()
+                    .assertComplete()
+                    .assertValue(customer -> "Ana".equals(customer.getFirstName()));
         }
     }
 
