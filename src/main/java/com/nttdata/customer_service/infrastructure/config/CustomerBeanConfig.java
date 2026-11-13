@@ -1,5 +1,6 @@
 package com.nttdata.customer_service.infrastructure.config;
 
+import com.nttdata.customer_service.application.mapper.CustomerCommandMapper;
 import com.nttdata.customer_service.application.service.CustomerApplicationService;
 import com.nttdata.customer_service.domain.port.out.CustomerRepositoryPort;
 import com.nttdata.customer_service.domain.validation.CustomerValidator;
@@ -55,15 +56,25 @@ public class CustomerBeanConfig {
     }
 
     /**
+     * @return mapper de comandos a modelo de dominio
+     */
+    @Bean
+    public CustomerCommandMapper customerCommandMapper() {
+        return new CustomerCommandMapper();
+    }
+
+    /**
      * Un solo bean implementa los cuatro casos de uso; el controlador los recibe por su interfaz.
      *
-     * @param customerRepository puerto de salida (lo implementa el adaptador de MongoDB)
-     * @param customerValidator  validador de reglas de negocio
+     * @param customerRepository    puerto de salida (lo implementa el adaptador de MongoDB)
+     * @param customerValidator     validador de reglas de negocio
+     * @param customerCommandMapper mapper de comandos a modelo de dominio
      * @return servicio de aplicación
      */
     @Bean
     public CustomerApplicationService customerApplicationService(CustomerRepositoryPort customerRepository,
-                                                                 CustomerValidator customerValidator) {
-        return new CustomerApplicationService(customerRepository, customerValidator);
+                                                                 CustomerValidator customerValidator,
+                                                                 CustomerCommandMapper customerCommandMapper) {
+        return new CustomerApplicationService(customerRepository, customerValidator, customerCommandMapper);
     }
 }

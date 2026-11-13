@@ -28,7 +28,8 @@ class CustomerBeanConfigTest {
                 List.of(config.personalCustomerRules(), config.businessCustomerRules()),
                 config.documentNumberValidator());
         CustomerApplicationService service =
-                config.customerApplicationService(mock(CustomerRepositoryPort.class), validator);
+                config.customerApplicationService(mock(CustomerRepositoryPort.class), validator,
+                        config.customerCommandMapper());
 
         assertThat(service).isNotNull();
     }

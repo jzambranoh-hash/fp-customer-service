@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nttdata.customer_service.application.mapper.CustomerCommandMapper;
 import com.nttdata.customer_service.domain.exception.BusinessRuleException;
 import com.nttdata.customer_service.domain.exception.CustomerNotFoundException;
 import com.nttdata.customer_service.domain.exception.DuplicateDocumentException;
@@ -55,7 +56,7 @@ class CustomerApplicationServiceTest {
     void setUp() {
         CustomerValidator validator = new CustomerValidator(
                 List.of(new PersonalCustomerRules(), new BusinessCustomerRules()), new DocumentNumberValidator());
-        service = new CustomerApplicationService(customerRepository, validator);
+        service = new CustomerApplicationService(customerRepository, validator, new CustomerCommandMapper());
     }
 
     // ---------------------------------------------------------------- create

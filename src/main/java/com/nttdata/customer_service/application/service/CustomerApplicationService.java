@@ -1,9 +1,9 @@
 package com.nttdata.customer_service.application.service;
 
+import com.nttdata.customer_service.application.mapper.CustomerCommandMapper;
 import com.nttdata.customer_service.domain.exception.CustomerNotFoundException;
 import com.nttdata.customer_service.domain.exception.DuplicateDocumentException;
 import com.nttdata.customer_service.domain.model.Customer;
-import com.nttdata.customer_service.domain.model.CustomerProfile;
 import com.nttdata.customer_service.domain.port.in.CreateCustomerCommand;
 import com.nttdata.customer_service.domain.port.in.CreateCustomerUseCase;
 import com.nttdata.customer_service.domain.port.in.DeleteCustomerUseCase;
@@ -39,17 +39,23 @@ public class CustomerApplicationService
 
     private final CustomerRepositoryPort customerRepository;
     private final CustomerValidator customerValidator;
-
-    // ------------------------------------------------------------------ registro
+    private final CustomerCommandMapper customerCommandMapper;
 
     @Override
     public Single<Customer> create(CreateCustomerCommand command) {
-        return Single.fromCallable(() -> newCustomer(command))
-                .map(customerValidator::validate)
+        return Single.fromCallable(() -> {
+                    Customer customer = customerCommandMapper.toCustomer(command);
+                    customerValidator.validate(customer); // Falla rápido aquí si hay error
+                    return customer; // Metemos el cliente validado a la tubería
+                })
                 .flatMap(customer -> customerRepository.existsByDocumentNumber(customer.getDocumentNumber())
-                        .flatMap(exists -> Boolean.TRUE.equals(exists)
-                                ? Single.<Customer>error(new DuplicateDocumentException(customer.getDocumentNumber()))
-                                : customerRepository.save(customer)))
+                        .flatMap(exists -> {
+                            if (exists) {
+                                return Single.error(new DuplicateDocumentException(customer.getDocumentNumber()));
+                            }
+                            return customerRepository.save(customer);
+                        })
+                )
                 .doOnSuccess(customer -> log.atInfo()
                         .setMessage("Cliente creado")
                         .addKeyValue("event", "customer.created")
@@ -57,24 +63,6 @@ public class CustomerApplicationService
                         .addKeyValue("customerType", customer.getCustomerType())
                         .log());
     }
-
-    private Customer newCustomer(CreateCustomerCommand command) {
-        return Customer.builder()
-                .documentType(command.documentType())
-                .documentNumber(command.documentNumber())
-                .customerType(command.customerType())
-                .profile(command.profile() != null ? command.profile() : CustomerProfile.STANDARD)
-                .firstName(command.firstName())
-                .lastName(command.lastName())
-                .businessName(command.businessName())
-                .email(command.email())
-                .phone(command.phone())
-                .address(command.address())
-                .active(Boolean.TRUE)
-                .build();
-    }
-
-    // ------------------------------------------------------------------ consultas
 
     @Override
     public Flowable<Customer> findAll() {
@@ -89,16 +77,17 @@ public class CustomerApplicationService
     @Override
     public Single<Customer> findByDocumentNumber(String documentNumber) {
         return customerRepository.findActiveByDocumentNumber(documentNumber)
-                .switchIfEmpty(Single.<Customer>error(() -> new CustomerNotFoundException(
-                        CustomerNotFoundException.DOCUMENT_NUMBER, documentNumber)));
+                .switchIfEmpty(Single.error(() -> new CustomerNotFoundException(CustomerNotFoundException.DOCUMENT_NUMBER, documentNumber)));
     }
-
-    // ------------------------------------------------------------------ modificación
 
     @Override
     public Single<Customer> update(String id, UpdateCustomerCommand command) {
         return findActiveById(id)
-                .map(customer -> customerValidator.validate(applyChanges(customer, command)))
+                .map(customer -> {
+                    Customer c = customerCommandMapper.applyChanges(customer, command);
+                    customerValidator.validate(c);
+                    return c;
+                })
                 .flatMap(customerRepository::save)
                 .doOnSuccess(customer -> log.atInfo()
                         .setMessage("Cliente actualizado")
@@ -106,30 +95,6 @@ public class CustomerApplicationService
                         .addKeyValue("customerId", customer.getId())
                         .addKeyValue("profile", customer.getProfile())
                         .log());
-    }
-
-    /**
-     * Los campos opcionales en null conservan su valor; email y phone siempre se reemplazan.
-     */
-    private Customer applyChanges(Customer customer, UpdateCustomerCommand command) {
-        if (command.profile() != null) {
-            customer.setProfile(command.profile());
-        }
-        if (command.firstName() != null) {
-            customer.setFirstName(command.firstName());
-        }
-        if (command.lastName() != null) {
-            customer.setLastName(command.lastName());
-        }
-        if (command.businessName() != null) {
-            customer.setBusinessName(command.businessName());
-        }
-        if (command.address() != null) {
-            customer.setAddress(command.address());
-        }
-        customer.setEmail(command.email());
-        customer.setPhone(command.phone());
-        return customer;
     }
 
     @Override
@@ -147,10 +112,9 @@ public class CustomerApplicationService
                         .log());
     }
 
-    // ------------------------------------------------------------------ auxiliares
-
     private Single<Customer> findActiveById(String id) {
         return customerRepository.findActiveById(id)
-                .switchIfEmpty(Single.<Customer>error(() -> new CustomerNotFoundException("id", id)));
+                .switchIfEmpty(Single.error(() -> new CustomerNotFoundException("id", id)));
     }
+
 }

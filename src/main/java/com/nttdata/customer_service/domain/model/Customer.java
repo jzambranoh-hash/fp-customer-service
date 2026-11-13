@@ -73,4 +73,5 @@ public class Customer {
     public void deactivate() {
         this.active = Boolean.FALSE;
     }
+
 }
