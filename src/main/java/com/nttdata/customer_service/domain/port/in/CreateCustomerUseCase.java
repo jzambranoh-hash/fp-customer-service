@@ -9,6 +9,8 @@ import io.reactivex.rxjava3.core.Single;
 public interface CreateCustomerUseCase {
 
     /**
+     * Registra un cliente nuevo.
+     *
      * @param command datos del cliente
      * @return el cliente creado; {@code BusinessRuleException} si incumple una regla,
      *         {@code DuplicateDocumentException} si el documento ya existe

@@ -47,6 +47,8 @@ public class CustomerController {
     private final CustomerWebMapper mapper;
 
     /**
+     * Lista los clientes activos.
+     *
      * @return clientes activos
      */
     @GetMapping
@@ -55,6 +57,8 @@ public class CustomerController {
     }
 
     /**
+     * Obtiene un cliente por su identificador.
+     *
      * @param id identificador del cliente
      * @return el cliente (200) o 404
      */
@@ -64,6 +68,8 @@ public class CustomerController {
     }
 
     /**
+     * Obtiene un cliente por su número de documento.
+     *
      * @param documentNumber número de documento
      * @return el cliente (200) o 404
      */
@@ -73,6 +79,8 @@ public class CustomerController {
     }
 
     /**
+     * Registra un cliente nuevo.
+     *
      * @param request datos del cliente, validados con las restricciones del contrato
      * @return el cliente creado (201)
      */
@@ -83,6 +91,8 @@ public class CustomerController {
     }
 
     /**
+     * Actualiza los datos editables de un cliente.
+     *
      * @param id      identificador del cliente
      * @param request nuevos datos
      * @return el cliente actualizado (200)
@@ -94,6 +104,8 @@ public class CustomerController {
     }
 
     /**
+     * Elimina un cliente (borrado lógico).
+     *
      * @param id identificador del cliente
      * @return sin contenido (204)
      */

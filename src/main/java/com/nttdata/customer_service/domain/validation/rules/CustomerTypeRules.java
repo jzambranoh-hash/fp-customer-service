@@ -14,6 +14,8 @@ import com.nttdata.customer_service.domain.model.CustomerType;
 public interface CustomerTypeRules {
 
     /**
+     * Indica el tipo de cliente que valida esta estrategia.
+     *
      * @return tipo de cliente que valida esta estrategia
      */
     CustomerType supports();

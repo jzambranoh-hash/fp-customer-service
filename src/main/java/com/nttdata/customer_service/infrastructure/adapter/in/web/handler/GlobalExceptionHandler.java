@@ -4,6 +4,8 @@ import com.nttdata.bootcamp.customer.dto.ErrorResponse;
 import com.nttdata.customer_service.domain.exception.BusinessRuleException;
 import com.nttdata.customer_service.domain.exception.CustomerNotFoundException;
 import com.nttdata.customer_service.domain.exception.DuplicateDocumentException;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -15,9 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 
-import java.time.OffsetDateTime;
-import java.util.List;
-
 /**
  * Adaptador de entrada: convierte las excepciones en respuestas HTTP con el formato {@link ErrorResponse}.
  *
@@ -26,6 +25,7 @@ import java.util.List;
  *   <li>4xx (rechazos esperados): WARN, {@code event=request.rejected}, con un {@code reason} estable.</li>
  *   <li>5xx (fallos inesperados): ERROR, {@code event=request.failed}, con stack trace.</li>
  * </ul>
+ *
  * <p>Se ejecuta en el contexto de Reactor, así que estos logs llevan el traceId de la petición.</p>
  */
 @Slf4j
@@ -76,7 +76,8 @@ public class GlobalExceptionHandler {
 
     /** Dos actualizaciones simultáneas del mismo cliente ({@code @Version}). */
     @ExceptionHandler(OptimisticLockingFailureException.class)
-    public ResponseEntity<ErrorResponse> handleOptimisticLock(OptimisticLockingFailureException ex, ServerWebExchange exchange) {
+    public ResponseEntity<ErrorResponse> handleOptimisticLock(OptimisticLockingFailureException ex,
+                                                              ServerWebExchange exchange) {
         return reject(HttpStatus.CONFLICT, "El cliente fue modificado por otra operación; vuelva a intentarlo",
                 "CONCURRENT_UPDATE", ex, exchange, List.of());
     }
@@ -112,7 +113,8 @@ public class GlobalExceptionHandler {
         return build(status, message, exchange, details);
     }
 
-    private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, ServerWebExchange exchange, List<String> details) {
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, ServerWebExchange exchange,
+                                                List<String> details) {
         ErrorResponse body = new ErrorResponse();
         body.setTimestamp(OffsetDateTime.now());
         body.setStatus(status.value());

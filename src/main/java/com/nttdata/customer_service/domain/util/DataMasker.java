@@ -12,6 +12,8 @@ public final class DataMasker {
     }
 
     /**
+     * Enmascara un número de documento.
+     *
      * @param value número de documento (DNI, RUC, etc.)
      * @return el documento con solo los últimos 4 caracteres visibles: {@code 97873773 → ****3773}
      */

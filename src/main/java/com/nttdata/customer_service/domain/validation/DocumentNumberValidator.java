@@ -25,6 +25,8 @@ public class DocumentNumberValidator {
     }
 
     /**
+     * Valida el número de documento según su tipo.
+     *
      * @param type   tipo de documento
      * @param number número de documento
      * @throws BusinessRuleException si el número no cumple el formato del tipo

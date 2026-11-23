@@ -15,6 +15,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class CustomerServiceApplication {
 
+    /**
+     * Arranca customer-service.
+     *
+     * @param args argumentos de línea de comandos
+     */
     public static void main(String[] args) {
         SpringApplication.run(CustomerServiceApplication.class, args);
     }

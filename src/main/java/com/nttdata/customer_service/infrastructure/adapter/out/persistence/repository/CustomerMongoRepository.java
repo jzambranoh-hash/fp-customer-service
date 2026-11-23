@@ -16,17 +16,23 @@ import org.springframework.stereotype.Repository;
 public interface CustomerMongoRepository extends RxJava3CrudRepository<CustomerDocument, String> {
 
     /**
+     * Lista los clientes activos.
+     *
      * @return clientes activos
      */
     Flowable<CustomerDocument> findByActiveTrue();
 
     /**
+     * Busca un cliente activo por su identificador.
+     *
      * @param id identificador
      * @return el cliente activo, o vacío
      */
     Maybe<CustomerDocument> findByIdAndActiveTrue(String id);
 
     /**
+     * Busca un cliente activo por su número de documento.
+     *
      * @param documentNumber número de documento
      * @return el cliente activo, o vacío
      */

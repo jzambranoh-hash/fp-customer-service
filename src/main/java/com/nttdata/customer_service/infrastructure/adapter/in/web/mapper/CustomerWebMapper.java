@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 public class CustomerWebMapper {
 
     /**
+     * Convierte el DTO de registro en el comando del caso de uso.
+     *
      * @param request DTO de registro
      * @return comando del caso de uso
      */
@@ -42,6 +44,8 @@ public class CustomerWebMapper {
     }
 
     /**
+     * Convierte el DTO de actualización en el comando del caso de uso.
+     *
      * @param request DTO de actualización
      * @return comando del caso de uso
      */
@@ -57,6 +61,8 @@ public class CustomerWebMapper {
     }
 
     /**
+     * Convierte el modelo de dominio en el DTO de respuesta.
+     *
      * @param customer modelo de dominio
      * @return DTO de respuesta
      */

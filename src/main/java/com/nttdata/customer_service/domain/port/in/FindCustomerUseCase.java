@@ -10,17 +10,23 @@ import io.reactivex.rxjava3.core.Single;
 public interface FindCustomerUseCase {
 
     /**
+     * Lista los clientes activos.
+     *
      * @return clientes activos
      */
     Flowable<Customer> findAll();
 
     /**
+     * Busca un cliente activo por su identificador.
+     *
      * @param id identificador del cliente
      * @return el cliente; {@code CustomerNotFoundException} si no existe o está inactivo
      */
     Single<Customer> findById(String id);
 
     /**
+     * Busca un cliente activo por su número de documento.
+     *
      * @param documentNumber número de documento
      * @return el cliente; {@code CustomerNotFoundException} si no existe o está inactivo
      */

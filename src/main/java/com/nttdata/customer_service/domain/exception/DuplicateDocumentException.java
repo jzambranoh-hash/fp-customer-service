@@ -10,6 +10,8 @@ import com.nttdata.customer_service.domain.util.DataMasker;
 public class DuplicateDocumentException extends RuntimeException {
 
     /**
+     * Crea la excepción con el número de documento repetido.
+     *
      * @param documentNumber número de documento repetido
      */
     public DuplicateDocumentException(String documentNumber) {

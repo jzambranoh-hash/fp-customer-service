@@ -3,8 +3,8 @@ package com.nttdata.customer_service.infrastructure.adapter.out.persistence.adap
 import com.nttdata.customer_service.domain.exception.DuplicateDocumentException;
 import com.nttdata.customer_service.domain.model.Customer;
 import com.nttdata.customer_service.domain.port.out.CustomerRepositoryPort;
-import com.nttdata.customer_service.infrastructure.adapter.out.persistence.repository.CustomerMongoRepository;
 import com.nttdata.customer_service.infrastructure.adapter.out.persistence.mapper.CustomerPersistenceMapper;
+import com.nttdata.customer_service.infrastructure.adapter.out.persistence.repository.CustomerMongoRepository;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;

@@ -9,6 +9,8 @@ import io.reactivex.rxjava3.core.Single;
 public interface UpdateCustomerUseCase {
 
     /**
+     * Actualiza los datos editables de un cliente.
+     *
      * @param id      identificador del cliente
      * @param command nuevos datos
      * @return el cliente actualizado

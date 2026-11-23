@@ -14,17 +14,23 @@ import io.reactivex.rxjava3.core.Single;
 public interface CustomerRepositoryPort {
 
     /**
+     * Lista los clientes activos.
+     *
      * @return clientes activos
      */
     Flowable<Customer> findAllActive();
 
     /**
+     * Busca un cliente activo por su identificador.
+     *
      * @param id identificador
      * @return el cliente activo, o vacío
      */
     Maybe<Customer> findActiveById(String id);
 
     /**
+     * Busca un cliente activo por su número de documento.
+     *
      * @param documentNumber número de documento
      * @return el cliente activo, o vacío
      */

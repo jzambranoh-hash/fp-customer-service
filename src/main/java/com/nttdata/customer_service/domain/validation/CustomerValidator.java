@@ -22,6 +22,8 @@ public class CustomerValidator {
     private final DocumentNumberValidator documentNumberValidator;
 
     /**
+     * Crea el validador indexando las estrategias por tipo de cliente.
+     *
      * @param rules                   estrategias por tipo de cliente
      * @param documentNumberValidator validador del número de documento
      * @throws IllegalStateException si hay dos estrategias para el mismo tipo

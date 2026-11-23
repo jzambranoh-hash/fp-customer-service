@@ -13,6 +13,8 @@ public class CustomerNotFoundException extends RuntimeException {
     public static final String DOCUMENT_NUMBER = "documentNumber";
 
     /**
+     * Crea la excepción indicando el campo y el valor buscados.
+     *
      * @param field campo usado en la búsqueda (id, documentNumber)
      * @param value valor buscado
      */

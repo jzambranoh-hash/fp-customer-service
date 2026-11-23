@@ -43,11 +43,7 @@ public class CustomerApplicationService
 
     @Override
     public Single<Customer> create(CreateCustomerCommand command) {
-        return Single.fromCallable(() -> {
-                    Customer customer = customerCommandMapper.toCustomer(command);
-                    customerValidator.validate(customer); // Falla rápido aquí si hay error
-                    return customer; // Metemos el cliente validado a la tubería
-                })
+        return Single.fromCallable(() -> toValidCustomer(command))
                 .flatMap(customer -> customerRepository.existsByDocumentNumber(customer.getDocumentNumber())
                         .flatMap(exists -> {
                             if (exists) {
@@ -77,7 +73,8 @@ public class CustomerApplicationService
     @Override
     public Single<Customer> findByDocumentNumber(String documentNumber) {
         return customerRepository.findActiveByDocumentNumber(documentNumber)
-                .switchIfEmpty(Single.error(() -> new CustomerNotFoundException(CustomerNotFoundException.DOCUMENT_NUMBER, documentNumber)));
+                .switchIfEmpty(Single.error(() -> new CustomerNotFoundException(
+                        CustomerNotFoundException.DOCUMENT_NUMBER, documentNumber)));
     }
 
     @Override
@@ -115,6 +112,13 @@ public class CustomerApplicationService
     private Single<Customer> findActiveById(String id) {
         return customerRepository.findActiveById(id)
                 .switchIfEmpty(Single.error(() -> new CustomerNotFoundException("id", id)));
+    }
+
+    /** Convierte el comando en cliente y lo valida; falla rápido si alguna regla no se cumple. */
+    private Customer toValidCustomer(CreateCustomerCommand command) {
+        Customer customer = customerCommandMapper.toCustomer(command);
+        customerValidator.validate(customer);
+        return customer;
     }
 
 }

@@ -6,6 +6,8 @@ package com.nttdata.customer_service.domain.exception;
 public class BusinessRuleException extends RuntimeException {
 
     /**
+     * Crea la excepción con el detalle de la regla incumplida.
+     *
      * @param message descripción de la regla incumplida
      */
     public BusinessRuleException(String message) {

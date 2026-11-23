@@ -8,6 +8,8 @@ import io.reactivex.rxjava3.core.Completable;
 public interface DeleteCustomerUseCase {
 
     /**
+     * Elimina un cliente (borrado lógico).
+     *
      * @param id identificador del cliente
      * @return señal de finalización; {@code CustomerNotFoundException} si no existe
      */

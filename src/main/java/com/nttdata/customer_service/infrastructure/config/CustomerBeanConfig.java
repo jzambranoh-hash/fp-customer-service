@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Configuration;
 public class CustomerBeanConfig {
 
     /**
+     * Registra la estrategia de validación de clientes PERSONAL.
+     *
      * @return estrategia de validación de clientes PERSONAL
      */
     @Bean
@@ -30,6 +32,8 @@ public class CustomerBeanConfig {
     }
 
     /**
+     * Registra la estrategia de validación de clientes BUSINESS.
+     *
      * @return estrategia de validación de clientes BUSINESS
      */
     @Bean
@@ -38,6 +42,8 @@ public class CustomerBeanConfig {
     }
 
     /**
+     * Registra el validador del formato del documento.
+     *
      * @return validador del formato del documento
      */
     @Bean
@@ -46,16 +52,21 @@ public class CustomerBeanConfig {
     }
 
     /**
+     * Registra el validador de reglas de negocio.
+     *
      * @param rules                   todas las estrategias registradas
      * @param documentNumberValidator validador del documento
      * @return validador de reglas de negocio (contexto del patrón Strategy)
      */
     @Bean
-    public CustomerValidator customerValidator(List<CustomerTypeRules> rules, DocumentNumberValidator documentNumberValidator) {
+    public CustomerValidator customerValidator(List<CustomerTypeRules> rules,
+                                               DocumentNumberValidator documentNumberValidator) {
         return new CustomerValidator(rules, documentNumberValidator);
     }
 
     /**
+     * Registra el mapper de comandos a modelo de dominio.
+     *
      * @return mapper de comandos a modelo de dominio
      */
     @Bean

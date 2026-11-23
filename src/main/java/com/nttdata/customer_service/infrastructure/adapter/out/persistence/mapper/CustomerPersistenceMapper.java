@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 public class CustomerPersistenceMapper {
 
     /**
+     * Convierte el modelo de dominio en documento de MongoDB.
+     *
      * @param customer modelo de dominio
      * @return documento para guardar
      */
@@ -38,6 +40,8 @@ public class CustomerPersistenceMapper {
     }
 
     /**
+     * Convierte un documento de MongoDB en modelo de dominio.
+     *
      * @param document documento leído de MongoDB
      * @return modelo de dominio
      */
