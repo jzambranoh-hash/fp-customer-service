@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import com.nttdata.customer_service.application.service.CustomerApplicationService;
 import com.nttdata.customer_service.domain.model.CustomerType;
+import com.nttdata.customer_service.domain.port.out.CustomerCachePort;
 import com.nttdata.customer_service.domain.port.out.CustomerRepositoryPort;
 import com.nttdata.customer_service.domain.validation.CustomerValidator;
 import java.util.List;
@@ -29,7 +30,7 @@ class CustomerBeanConfigTest {
                 config.documentNumberValidator());
         CustomerApplicationService service =
                 config.customerApplicationService(mock(CustomerRepositoryPort.class), validator,
-                        config.customerCommandMapper());
+                        config.customerCommandMapper(), mock(CustomerCachePort.class));
 
         assertThat(service).isNotNull();
     }

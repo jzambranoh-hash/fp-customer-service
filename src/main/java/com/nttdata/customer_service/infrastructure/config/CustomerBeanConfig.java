@@ -2,6 +2,7 @@ package com.nttdata.customer_service.infrastructure.config;
 
 import com.nttdata.customer_service.application.mapper.CustomerCommandMapper;
 import com.nttdata.customer_service.application.service.CustomerApplicationService;
+import com.nttdata.customer_service.domain.port.out.CustomerCachePort;
 import com.nttdata.customer_service.domain.port.out.CustomerRepositoryPort;
 import com.nttdata.customer_service.domain.validation.CustomerValidator;
 import com.nttdata.customer_service.domain.validation.DocumentNumberValidator;
@@ -85,7 +86,9 @@ public class CustomerBeanConfig {
     @Bean
     public CustomerApplicationService customerApplicationService(CustomerRepositoryPort customerRepository,
                                                                  CustomerValidator customerValidator,
-                                                                 CustomerCommandMapper customerCommandMapper) {
-        return new CustomerApplicationService(customerRepository, customerValidator, customerCommandMapper);
+                                                                 CustomerCommandMapper customerCommandMapper,
+                                                                 CustomerCachePort customerCachePort) {
+        return new CustomerApplicationService(customerRepository, customerValidator, customerCommandMapper,
+                customerCachePort);
     }
 }

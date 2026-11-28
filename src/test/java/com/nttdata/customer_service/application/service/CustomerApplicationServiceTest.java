@@ -2,9 +2,7 @@ package com.nttdata.customer_service.application.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.nttdata.customer_service.application.mapper.CustomerCommandMapper;
 import com.nttdata.customer_service.domain.exception.BusinessRuleException;
@@ -16,11 +14,13 @@ import com.nttdata.customer_service.domain.model.CustomerType;
 import com.nttdata.customer_service.domain.model.DocumentType;
 import com.nttdata.customer_service.domain.port.in.CreateCustomerCommand;
 import com.nttdata.customer_service.domain.port.in.UpdateCustomerCommand;
+import com.nttdata.customer_service.domain.port.out.CustomerCachePort;
 import com.nttdata.customer_service.domain.port.out.CustomerRepositoryPort;
 import com.nttdata.customer_service.domain.validation.CustomerValidator;
 import com.nttdata.customer_service.domain.validation.DocumentNumberValidator;
 import com.nttdata.customer_service.domain.validation.rules.BusinessCustomerRules;
 import com.nttdata.customer_service.domain.validation.rules.PersonalCustomerRules;
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
@@ -50,13 +50,19 @@ class CustomerApplicationServiceTest {
     @Mock
     private CustomerRepositoryPort customerRepository;
 
+    @Mock
+    private CustomerCachePort customerCache;
+
     private CustomerApplicationService service;
 
     @BeforeEach
     void setUp() {
         CustomerValidator validator = new CustomerValidator(
                 List.of(new PersonalCustomerRules(), new BusinessCustomerRules()), new DocumentNumberValidator());
-        service = new CustomerApplicationService(customerRepository, validator, new CustomerCommandMapper());
+        lenient().when(customerCache.get(anyString())).thenReturn(Maybe.empty());
+        lenient().when(customerCache.put(any())).thenReturn(Completable.complete());
+        lenient().when(customerCache.evict(anyString())).thenReturn(Completable.complete());
+        service = new CustomerApplicationService(customerRepository, validator, new CustomerCommandMapper(), customerCache);
     }
 
     // ---------------------------------------------------------------- create

@@ -10,6 +10,7 @@ import com.nttdata.customer_service.domain.port.in.DeleteCustomerUseCase;
 import com.nttdata.customer_service.domain.port.in.FindCustomerUseCase;
 import com.nttdata.customer_service.domain.port.in.UpdateCustomerCommand;
 import com.nttdata.customer_service.domain.port.in.UpdateCustomerUseCase;
+import com.nttdata.customer_service.domain.port.out.CustomerCachePort;
 import com.nttdata.customer_service.domain.port.out.CustomerRepositoryPort;
 import com.nttdata.customer_service.domain.validation.CustomerValidator;
 import io.reactivex.rxjava3.core.Completable;
@@ -40,6 +41,7 @@ public class CustomerApplicationService
     private final CustomerRepositoryPort customerRepository;
     private final CustomerValidator customerValidator;
     private final CustomerCommandMapper customerCommandMapper;
+    private final CustomerCachePort customerCachePort;
 
     @Override
     public Single<Customer> create(CreateCustomerCommand command) {
@@ -67,7 +69,10 @@ public class CustomerApplicationService
 
     @Override
     public Single<Customer> findById(String id) {
-        return findActiveById(id);
+        return customerCachePort.get(id)                                                 // 1. ¿está en Redis?
+                .switchIfEmpty(Single.defer(() -> findActiveById(id)                     // 2. miss → Mongo
+                        .flatMap(customer -> customerCachePort.put(customer)    // 3. guardarlo en Redis
+                                .andThen(Single.just(customer)))));
     }
 
     @Override
@@ -86,6 +91,8 @@ public class CustomerApplicationService
                     return c;
                 })
                 .flatMap(customerRepository::save)
+                .flatMap(saved -> customerCachePort.evict(saved.getId())          // ← invalidar
+                        .andThen(Single.just(saved)))
                 .doOnSuccess(customer -> log.atInfo()
                         .setMessage("Cliente actualizado")
                         .addKeyValue("event", "customer.updated")
@@ -102,6 +109,7 @@ public class CustomerApplicationService
                     return customerRepository.save(customer);
                 })
                 .ignoreElement()
+                .andThen(customerCachePort.evict(id))                             // ← invalidar
                 .doOnComplete(() -> log.atInfo()
                         .setMessage("Cliente desactivado")
                         .addKeyValue("event", "customer.deactivated")
